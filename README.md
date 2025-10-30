@@ -1,16 +1,24 @@
-# topcorner_shop
+Kadek Chandra Rasmi | 2406426473 | PBP E
 
-A new Flutter project.
+<details>
+<summary>Tugas 7 : Elemen Dasar Flutter</summary>
+ 
+### Jelaskan apa itu widget tree pada Flutter dan bagaimana hubungan parent-child (induk-anak) bekerja antar widget.
+ans
 
-## Getting Started
+### Sebutkan semua widget yang kamu gunakan dalam proyek ini dan jelaskan fungsinya.
+ans
 
-This project is a starting point for a Flutter application.
+### Apa fungsi dari widget `MaterialApp`? Jelaskan mengapa widget ini sering digunakan sebagai widget root.
+ans
 
-A few resources to get you started if this is your first Flutter project:
+### Jelaskan perbedaan antara `StatelessWidget` dan `StatefulWidget`. Kapan kamu memilih salah satunya?
+ans
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Apa itu `BuildContext` dan mengapa penting di Flutter? Bagaimana penggunaannya di metode `build`?
+ans
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Jelaskan konsep "hot reload" di Flutter dan bagaimana bedanya dengan "hot restart"
+ans
+
+</details>
