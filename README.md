@@ -31,7 +31,7 @@ Widget parent/induk adalah widget yang membungkus widget lain. Sedangkan, widget
 
 ### Apa fungsi dari widget `MaterialApp`? Jelaskan mengapa widget ini sering digunakan sebagai widget root.
 Widget MaterialApp berfungsi untuk menyediakan kofigurasi global seperti judul aplikasi, theme, dan halaman utama. 
-'''
+```
 return MaterialApp( 
       title: 'Flutter Demo', 
       theme: ThemeData( 
@@ -41,7 +41,7 @@ return MaterialApp(
       ), 
       home: MyHomePage(), 
     );
-'''
+```
 
 MaterialApp digunakan sebagai root widget karena MaterialApp menyediakan context yang dibutuhkan semua widget Material di bawahnya. Widget seperti Scaffold, AppBar, SnackBar, dan FloatingActionButton membutuhkan MaterialApp di atasnya agar dapat ditampilkan dengan gaya yang benar. Ia juga menyediakan navigator, tema, dan localization untuk seluruh aplikasi. Selain itu, MaterialApp juga dijadikan root karena standar convention flutter sehingga kode kita mudah dipahami developer lain. 
 
@@ -54,7 +54,7 @@ Sedangkan `StatefulWidget` adalah widget yang bisa berubah. Memiliki object stat
 BuildContext adalah objek yang menyediakan informasi tentang posisi widget dalam pohon widget (widget tree) dan hubungannya dengan widget lain. `BuildContext` penting di flutter karena membantu widget memahami lokasinya dalam hierarki, mengakses data tema, media query, dan layanan lain yang disediakan oleh parent widget, serta memungkinkan navigasi dan menampilkan dialog/SnackBar. 
 
 Contohnya pada penggunaannya di method `build` :
-'''
+```
 @override
 Widget build(BuildContext context) {
   // Context digunakan untuk mengakses berbagai properti
@@ -65,7 +65,7 @@ Widget build(BuildContext context) {
     ),
   );
 }
-'''
+```
 `BuildContext` digunakan untuk mengakses tema aplikasi (pada Theme.of(context)), mengakses informasi tentang device (MediaQuery.of(context)), serta menampilkan SnackBar (ScaffoldMessenger.of(context)).
 
 
