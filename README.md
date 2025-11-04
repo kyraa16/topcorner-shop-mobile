@@ -43,7 +43,7 @@ return MaterialApp(
     );
 ```
 
-MaterialApp digunakan sebagai root widget karena MaterialApp menyediakan context yang dibutuhkan semua widget Material di bawahnya. Widget seperti Scaffold, AppBar, SnackBar, dan FloatingActionButton membutuhkan MaterialApp di atasnya agar dapat ditampilkan dengan gaya yang benar. Ia juga menyediakan navigator, tema, dan localization untuk seluruh aplikasi. Selain itu, MaterialApp juga dijadikan root karena standar convention flutter sehingga kode kita mudah dipahami developer lain. 
+MaterialApp digunakan sebagai root widget karena MaterialApp menyediakan context yang dibutuhkan semua widget Material di bawahnya. Widget seperti Scaffold, AppBar, SnackBar, dan FloatingActionButton membutuhkan MaterialApp di atasnya agar dapat ditampilkan dengan style yang benar. Ia juga menyediakan navigator, tema, dan localization untuk seluruh aplikasi. Selain itu, MaterialApp juga dijadikan root karena standar convention flutter sehingga kode kita mudah dipahami developer lain. 
 
 ### Jelaskan perbedaan antara `StatelessWidget` dan `StatefulWidget`. Kapan kamu memilih salah satunya?
 `StatelessWidget` adalah widget yang tidak berubah. Cocok dipakai jika tidak ada kondisi perubahan setelah widget dibuat. Contohnya pada `MyApp`, `MyHomePage`, `InfoCard`, dan `ItemCard` yang semuanya menggunakan StatelessWidget karnea tidak memerlukan perubahan tampilan yang dinamis. Widget ini hanya rebuild ketika parent-nya rebuild. Keuntungannya adalah lebih ringan. 
