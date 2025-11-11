@@ -37,7 +37,7 @@ return MaterialApp(
       theme: ThemeData( 
         colorScheme: ColorScheme.fromSwatch( 
           primarySwatch: Colors.cyan, 
-        ).copyWith(secondary: Colors.cyanAccent[900]), 
+        ).copyWith(secondary: Colors.cyanAccent[700]), 
       ), 
       home: MyHomePage(), 
     );
