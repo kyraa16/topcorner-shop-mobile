@@ -1,43 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:topcorner_shop/screens/menu.dart';
 import 'package:topcorner_shop/screens/productlist_form.dart';
+import 'package:topcorner_shop/screens/product_entry_list.dart';
+import 'package:topcorner_shop/screens/login.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class ItemCard extends StatelessWidget {
-  // Menampilkan kartu dengan ikon dan nama.
-
   final ItemHomepage item;
   final VoidCallback? onTap;
 
-  const ItemCard(this.item, {this.onTap, super.key});
+  const ItemCard(this.item, {super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Material(
-      // Menentukan warna latar belakang dari tema aplikasi.
-      color: item.color,
-      // Membuat sudut kartu melengkung.
+      color: item.color, 
       borderRadius: BorderRadius.circular(12),
 
       child: InkWell(
-        // Aksi ketika kartu ditekan.
-        onTap:
-            onTap ??
-            () {
-              // Menampilkan pesan SnackBar saat kartu ditekan.
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
+        onTap: () async {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text("Kamu telah menekan tombol ${item.name}!"),
+              ),
+            );
+
+          if (item.name == "Create Products") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProductFormPage()),
+            );
+          }
+
+          else if (item.name == "All Products") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProductEntryListPage(
+                  initialShowAll: true,  // Filter ke All Products
+                ),
+              ),
+            );
+          }
+
+          else if (item.name == "My Products") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProductEntryListPage(
+                  initialShowAll: false,  // Filter ke My Products
+                ),
+              ),
+            );
+          }
+
+          else if (item.name == "Logout") {
+            final response = await request.logout(
+              "http://localhost:8000/auth/logout/"
+            );
+            String message = response["message"];
+            
+            if (context.mounted) {
+              if (response['status']) {
+                String uname = response["username"];
+                ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Kamu telah menekan tombol ${item.name}!"),
+                    content: Text("$message See you again, $uname."),
                   ),
                 );
-            },
-        // Container untuk menyimpan Icon dan Text
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                  (route) => false,
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                  ),
+                );
+              }
+            }
+          }
+
+          if (onTap != null) {
+            onTap!();
+          }
+        },
+        
         child: Container(
           padding: const EdgeInsets.all(8),
           child: Center(
             child: Column(
-              // Menyusun ikon dan teks di tengah kartu.
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(item.icon, color: Colors.white, size: 30.0),

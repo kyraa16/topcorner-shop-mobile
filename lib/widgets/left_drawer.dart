@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:topcorner_shop/screens/menu.dart';
 import 'package:topcorner_shop/screens/productlist_form.dart';
+import 'package:topcorner_shop/screens/product_entry_list.dart';
+import 'package:topcorner_shop/screens/login.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -38,16 +42,31 @@ class LeftDrawer extends StatelessWidget {
               ],
             ),
           ),
-          // -TODO: Bagian routing
+
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Home'),
             // Bagian redirection ke MyHomePage
             onTap: () {
-              // Navigator.of(context).pop();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => MyHomePage()),
+              );
+            },
+          ),
+
+          // -TODO: Bagian routing
+          ListTile(
+            leading: const Icon(Icons.list),
+            title: const Text('Product List'),
+            // Bagian redirection ke MyHomePage
+            onTap: () {
+              // Route to news list page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProductEntryListPage(),
+                ),
               );
             },
           ),
@@ -64,12 +83,41 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
 
-          //ListTile untuk ke halaman melihat produk
-          // ListTile(
-          //   leading: const Icon(Icons.view_list),
-          //   title: const Text('See All Products'),
-          //   onTap: () {},
-          // ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Log Out'),
+            onTap: () async {
+              // Get CookieRequest instance
+              final request = context.read<CookieRequest>();
+
+              // Call logout endpoint
+              final response = await request.logout(
+                "http://localhost:8000/auth/logout/",
+              );
+
+              String message = response["message"];
+
+              if (context.mounted) {
+                if (response['status']) {
+                  String uname = response["username"];
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("$message See you again, $uname.")),
+                  );
+
+                  // Navigate to LoginPage and remove all previous routes
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (route) => false,
+                  );
+                } else {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(message)));
+                }
+              }
+            },
+          ),
         ],
       ),
     );

@@ -11,9 +11,9 @@ class MyHomePage extends StatelessWidget {
   final String kelas = "E"; //kelas
 
   final List<ItemHomepage> items = [
-    ItemHomepage("All Products", Icons.store, Colors.blue.shade600),
-    ItemHomepage("My Products", Icons.inventory_2, Colors.green.shade600),
-    ItemHomepage("Create Products", Icons.add, Colors.red.shade600),
+    ItemHomepage("All Products", Icons.store, Colors.cyan),
+    ItemHomepage("My Products", Icons.inventory_2, Colors.cyan),
+    ItemHomepage("Create Products", Icons.add, Colors.cyan),
   ];
 
   @override
@@ -79,21 +79,8 @@ class MyHomePage extends StatelessWidget {
                     // Agar grid menyesuaikan tinggi kontennya.
                     shrinkWrap: true,
 
-                    // Menampilkan ItemCard untuk setiap item dalam list items.
                     children: items.map((ItemHomepage item) {
-                      return ItemCard(
-                        item,
-                        onTap: () {
-                          if (item.name == "Create Products") {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const ProductFormPage(),
-                              ),
-                            );
-                          }
-                        },
-                      );
+                      return ItemCard(item);
                     }).toList(),
                   ),
                 ],
