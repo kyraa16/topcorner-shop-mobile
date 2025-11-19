@@ -170,3 +170,84 @@ warna ini akan menjadi warna dominan aplikasi yang dapat dipakai di berbagai hal
 Konsistensi juga akan terjaga karena warna yang sama dapat diakses secara langsung tanpa memilih warna secara manual (yang bisa mengakibatkan ketidakkonsistenan warna), yaitu cotohnya dengan :
 `backgroundColor: Theme.of(context).colorScheme.primary,`. Tidak dihard code warnanya dan memudahkan penggantian tema jika dibutuhkan sehingga cukup menggandi di main.dart nya saja. 
 </details>
+
+<details>
+<summary>Tugas 9: Integrasi Layanan Web Django dengan Aplikasi Flutter</summary>
+ 
+### Jelaskan mengapa kita perlu membuat model Dart saat mengambil/mengirim data JSON? Apa konsekuensinya jika langsung memetakan Map<String, dynamic> tanpa model (terkait validasi tipe, null-safety, maintainability)?
+
+Model Dart diperlukan untuk memberikan struktur dan tipe data yang jelas saat bekerja dengan JSON. Tanpa model, kita hanya bekerja dengan Map<String, dynamic> yang tidak type-safe dan rawan error. Konsekuensi tanpa model:
+- Validasi Tipe yang lemah. Tidak ada compile-time checking. Error baru muncul saat runtime ketika mengakses field dengan tipe yang salah (misalnya mengakses integer sebagai string).
+Null-Safety lemah. Sulit mengelola nilai null. Dengan model, kita bisa eksplisit menandai field sebagai nullable (String?) atau required, sehingga compiler membantu mendeteksi potensi null pointer.
+Maintainability yang buruk dan code menjadi sulit di-maintain. Setiap akses data harus manual type-casting seperti data['name'] as String. Dengan model, IDE dapat memberikan autocomplete dan refactoring otomatis.
+
+### Apa fungsi package http dan CookieRequest dalam tugas ini? Jelaskan perbedaan peran http vs CookieRequest.
+
+Package http berfungsi sebagai library standar Dart untuk HTTP requests (GET, POST, PUT, DELETE). Bersifat stateless, tidak menyimpan session/cookie antar request
+Cocok untuk API yang tidak memerlukan autentikasi atau menggunakan token-based auth
+Setiap request independen dan tidak "mengingat" request sebelumnya.
+
+Sedangkan CookieRequest (dari pbp_django_auth) merupakan Custom wrapper yang menyimpan cookie session secara otomatis. Bersifat stateful dan memaintain session antar request, cocok untuk Django session-based authentication. package ini menangani CSRF token dan cookie secara otomatis sehingga memudahkan integrasi dengan Django authentication system. 
+
+Perbedaan peran keduanya adalah http digunakan untuk request sederhana tanpa perlu session persistence. Sedangkan CookieRequest untuk aplikasi yang butuh maintain login state dan session dengan Django.
+
+### Jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter.
+Instance CookieRequest perlu dibagikan (shared) menggunakan Provider karena bersifat Single Source of Truth atau semua komponen menggunakan session yang sama. Ketika user login di satu halaman, semua halaman lain langsung tahu user sudah authenticated. Berguna unutk session sonsistency. Cookie dan session state harus konsisten di seluruh aplikasi. Jika setiap widget membuat instance sendiri, mereka akan punya session terpisah dan tidak sinkron. Meningkatkan efisiensi memory karena tidak perlu membuat multiple instance yang redundant. Satu instance cukup untuk handle semua HTTP request dalam aplikasi. Serta emudahkan management state login/logout. Ketika logout, cukup clear satu instance dan semua komponen otomatis terupdate.
+
+### Jelaskan konfigurasi konektivitas yang diperlukan agar Flutter dapat berkomunikasi dengan Django. Mengapa kita perlu menambahkan 10.0.2.2 pada ALLOWED_HOSTS, mengaktifkan CORS dan pengaturan SameSite/cookie, dan menambahkan izin akses internet di Android? Apa yang akan terjadi jika konfigurasi tersebut tidak dilakukan dengan benar?
+
+`10.0.2.2` di ALLOWED_HOSTS dibutuhkan karnea Android emulator tidak bisa akses localhost host machine. `10.0.2.2` adalah special IP yang di-route ke localhost host. Dengan ini, request dari emulator dapat diterima Django tanpa error "Invalid HTTP_HOST"
+
+CORS (Cross-Origin Resource Sharing) prlu diaktifkan karena Flutter web/mobile dianggap "different origin" dari Django backend. CORS middleware mengizinkan Flutter mengakses API Django dari domain/port berbeda. Tanpa CORS, browser/app akan block request dengan error CORS policy.
+
+SameSite Cookie Setting diatur untuk mengizinkan cookie dikirim dari cross-origin requests. Dengan ini session cookie dapat disimpan di Flutter. Lalu, terakhir kita perlu menambahkan izin akses internet di Androind karena secara default Androic block interner access untuk security. Dengan permission ini, aplikasi dapat melakukan network request sehingga dapat terhubung dengan Django. 
+
+### Jelaskan mekanisme pengiriman data mulai dari input hingga dapat ditampilkan pada Flutter.
+Berikut mekanisme alur pengiriman data mulai dari input hingga dapat ditampilkan di Flutter:
+1. User input di form → validasi lokal (validator, required, format).
+2. Buat model (instance Dart) dan serialisasi untuk menghasilkan JSON.
+3. Kirim request HTTP (pakai CookieRequest/http) ke endpoint Django (POST/PUT). Sertakan header/CSRF bila perlu.
+4. Django menerima request, lalu parsing JSON, validasi server-side (serializer/form), simpan ke DB.
+5. Django mengembalikan response JSON (sukses atau error). Jika otentikasi session, response juga menyertakan Set-Cookie.
+6. Flutter menerima response → parse JSON ke model (fromJson), periksa status.
+7. Update state UI Provider dengan model baru.
+8. UI merender data dari model — tampil di layar.
+
+### Jelaskan mekanisme autentikasi dari login, register, hingga logout. Mulai dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
+
+- Register :
+  1. User mengisi username & passord di register page dan klik button register.
+  2. Lakukan validasi
+  3. Kirim POST ke endpoint `'http://localhost:8000/auth/register/'` dengan JSON
+  4. Django melakukan validasi. Jika sukses, user baru akan berhasil dibuat
+  5. Return respon sukses/error
+    
+- Login :
+  1. User isi username & password di Login Page. Lalu klik button login.
+  2. Kirim request POST ke django melalui ` 'http://localhost:8000/auth/login/'`
+  3. Function view di Django akan menerima credentials dan melakukan authentikasi.
+  4. Jika valid, maka akan create session dan set cookie last_login
+  5. Return succes & user data atau error
+  6. Pada Flutter, CookieRequest opomatis menyimpan session cookie.
+  7. Parse response untuk ambil data user.
+  8. Lalu navigasikan ke Home Page.
+     
+- Logout:
+  1. Trigger di flutter saat user klit button logout di drawer
+  2. request dikirim ke django. Lalu django memproses function pada view dengan request yang diterima.
+  3. Destroy session di server, delete cookie last_login, lalu return seccess response jika berhasil.
+  4. Pada Flutter, CookieRequest akan menghapus session cookie.
+  5. Navigate ke login page
+
+### Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step! (bukan hanya sekadar mengikuti tutorial).
+Berikut tahapan yang saya lakukan untuk mengimplementasikan checklist:
+1. Mengimplementasikan fitur register akun. Membuat register page dan menghubungkan dengan django project saya sebelumnya. Membuat dan mengimplementasikan endpoint untuk register.
+2. Mengimplementasikan fitur login. Membuat page login. Implementasi menggunakan method request.login() dari package pbp_django_auth untuk mengirim credentials ke endpoint /auth/login Django.
+3. Melakukan integrasi dengan Provider di main.dart untuk share instance CookieRequest ke seluruh aplikasi. Melakukan konfigurasi tambahan pada project Django lama saya. 
+4. Membuat model ProductEntry yang sesuai dengan struktur JSON dari Django.
+5. Membuat halaman daftar produk yang menampilkan semua produk dari endpoint /json dengan ListView.builder. Setiap produk ditampilkan dalam ProductEntryCard widget. 
+6. Membuat halaman detail item yang menampilkan detail keseluruhan mengenai suatu produk. Saya membuat UI untuk halaman ini dan membuat tombol back juga untuk kembali ke Halaman List produk.
+7. Membuat filter item dengan 2 kategori, yaitu All Products dan My Products. Menambahkan endpoint baru /json/my-product/ di Django yang melakukan query untuk mengambil object Product yang dibuat berasosiasi dengan seorang user.
+8. Terakhir melakukan penyesuaian tampilan dan konsistensi warna. Serta melakuakn push ke github. 
+
+</details>
